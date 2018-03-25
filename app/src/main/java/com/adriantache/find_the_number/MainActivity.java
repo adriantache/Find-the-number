@@ -1,8 +1,12 @@
 package com.adriantache.find_the_number;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
+
+import java.lang.reflect.Array;
 
 /**
  * This program resolves the following quiz:
@@ -22,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     TextView textView;
     boolean numberFound = false;
     //init sieve to check it rapidly
-    int[] sieve = new int[1001];
+    boolean[] sieve = new boolean[1001];
     //rule 1
     //start at 243, due to rules 1, 3, 4, 5, 6, 7
     int currentNumber = 243;
@@ -35,15 +39,16 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView2);
         updateNumber();
 
-        //start by finding primes
-        findPrimes();
-
-        while (!numberFound && currentNumber <= 1000) {
-            if (sieve[currentNumber] == 0) {
+        //start by finding primes (rule 2)
+        findNonPrimes();
+        
+        //then go through all the rules and stop if you find a qualifying number
+        while (!numberFound && currentNumber < 1000) {
+            if (!sieve[currentNumber]) {
                 updateNumber();
-                if (steps5to7()) {
+                if (rules5to7()) {
                     updateNumber();
-                    if (steps3and4()) {
+                    if (rules3and4()) {
                         updateNumber();
                         numberFound = true;
                         foundNumber();
@@ -52,23 +57,28 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             currentNumber++;
+            updateNumber();
         }
+
     }
 
-    private void findPrimes() {
+    //find all non-primes using the sieve of Eratosthenes
+    private void findNonPrimes() {
         //init first two numbers as non-prime
-        sieve[0] = 1;
-        sieve[1] = 1;
+        sieve[0] = true;
+        sieve[1] = true;
 
-        for (int i = 2; i <= 1000; i++) {
-            if (sieve[i] == 1) continue;
-            for (int j = 2; j < 1000 / i; j++) {
-                sieve[i * j] = 1;
+        //build up the sieve, marking non-primes = true
+        for (int i = 2; i <= (int) Math.sqrt(1000); i++) {
+            if (sieve[i]) continue;
+            for (int j = (int)java.lang.Math.pow((double)i,2); j <= 1000; j+=i) {
+                sieve[j] = true;
             }
         }
     }
 
-    private boolean steps5to7() {
+    //grouped solutions using strings
+    private boolean rules5to7() {
         String workString = String.valueOf(currentNumber);
 
         //starting with rule 7
@@ -82,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
         return workString.charAt(0) - '1' + workString.charAt(1) - '1' % 2 != 0;
     }
 
-    private boolean steps3and4() {
+    //grouped solutions using ints
+    private boolean rules3and4() {
         int sumDigits = 0;
         int workNumber = currentNumber;
 
@@ -102,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(String.valueOf(currentNumber));
 
         //todo pause for dramatic effect
+
     }
 
     public void foundNumber() {
