@@ -1,12 +1,8 @@
 package com.adriantache.find_the_number;
 
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.TextView;
-
-import java.lang.reflect.Array;
 
 /**
  * This program resolves the following quiz:
@@ -24,10 +20,9 @@ import java.lang.reflect.Array;
 
 public class MainActivity extends AppCompatActivity {
     TextView textView;
-    boolean numberFound = false;
     //init sieve to check it rapidly
     boolean[] sieve = new boolean[1001];
-    //rule 1
+    //Rule 1
     //start at 243, due to rules 1, 3, 4, 5, 6, 7
     int currentNumber = 243;
 
@@ -37,32 +32,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textView = findViewById(R.id.textView2);
-        updateNumber();
 
-        //start by finding primes (rule 2)
+        //start by finding primes (Rule 2)
         findNonPrimes();
 
         //then go through all the rules and stop if you find a qualifying number
-        while (!numberFound && currentNumber < 1000) {
+        while (currentNumber < 1000) {
             if (!sieve[currentNumber]) {
-                updateNumber();
                 if (rules5to7()) {
-                    updateNumber();
                     if (rules3and4()) {
-                        updateNumber();
-                        numberFound = true;
                         foundNumber();
                         break;
                     }
                 }
             }
             currentNumber++;
-            updateNumber();
         }
-
     }
 
-    //find all non-primes using the sieve of Eratosthenes
+    //find all non-primes using the Sieve of Eratosthenes (Rule 2)
     private void findNonPrimes() {
         //init first two numbers as non-prime
         sieve[0] = true;
@@ -71,52 +59,46 @@ public class MainActivity extends AppCompatActivity {
         //build up the sieve, marking non-primes = true
         for (int i = 2; i <= (int) Math.sqrt(1000); i++) {
             if (sieve[i]) continue;
-            for (int j = (int)java.lang.Math.pow((double)i,2); j <= 1000; j+=i) {
+            for (int j = (int) java.lang.Math.pow((double) i, 2); j <= 1000; j += i) {
                 sieve[j] = true;
             }
         }
     }
 
-    //grouped solutions using strings
+    //grouped solutions using Strings (Rules 5 - 7)
     private boolean rules5to7() {
         String workString = String.valueOf(currentNumber);
 
-        //starting with rule 7
+        //Rule 7
         if (currentNumber % 10 != workString.length()) return false;
 
-        //rule 6
+        //Rule 6
         int rule6 = workString.charAt(workString.length() - 2) - '0';
         if (rule6 % 2 != 0 || rule6 < 2) return false;
 
-        //rule 5
+        //Rule 5
         return (workString.charAt(0) - '0' + workString.charAt(1) - '0') % 2 != 0;
     }
 
-    //grouped solutions using ints
+    //grouped solutions using ints (Rules 3 & 4)
     private boolean rules3and4() {
         int sumDigits = 0;
         int workNumber = currentNumber;
 
         while (workNumber > 0) {
-            //step 3
+            //Rule 3
             if (workNumber % 10 == 1 || workNumber % 10 == 7) return false;
             sumDigits += workNumber % 10;
+            //Rule 4
             if (sumDigits > 10) return false;
             workNumber /= 10;
         }
 
-        //step 4
-        return sumDigits < 11;
-    }
-
-    private void updateNumber() {
-        textView.setText(String.valueOf(currentNumber));
-        //todo pause for dramatic effect
-
+        return true;
     }
 
     public void foundNumber() {
+        textView.setText(String.valueOf(currentNumber));
         textView.setTextColor(0xFF388E3C);
-        Log.i("FOUND", "updateNumber: "+currentNumber);
     }
 }
