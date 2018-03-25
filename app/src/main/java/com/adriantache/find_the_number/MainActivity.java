@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         //start by finding primes (rule 2)
         findNonPrimes();
-        
+
         //then go through all the rules and stop if you find a qualifying number
         while (!numberFound && currentNumber < 1000) {
             if (!sieve[currentNumber]) {
@@ -85,11 +85,11 @@ public class MainActivity extends AppCompatActivity {
         if (currentNumber % 10 != workString.length()) return false;
 
         //rule 6
-        int rule6 = workString.charAt(workString.length() - 1) - '1';
+        int rule6 = workString.charAt(workString.length() - 2) - '0';
         if (rule6 % 2 != 0 || rule6 < 2) return false;
 
         //rule 5
-        return workString.charAt(0) - '1' + workString.charAt(1) - '1' % 2 != 0;
+        return (workString.charAt(0) - '0' + workString.charAt(1) - '0') % 2 != 0;
     }
 
     //grouped solutions using ints
@@ -106,17 +106,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //step 4
-        return sumDigits % 2 != 0;
+        return sumDigits < 11;
     }
 
     private void updateNumber() {
         textView.setText(String.valueOf(currentNumber));
-
         //todo pause for dramatic effect
 
     }
 
     public void foundNumber() {
-        textView.setTextColor(0x388E3C);
+        textView.setTextColor(0xFF388E3C);
+        Log.i("FOUND", "updateNumber: "+currentNumber);
     }
 }
