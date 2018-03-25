@@ -36,11 +36,11 @@ public class MainActivity extends AppCompatActivity {
         //start by finding primes (Rule 2)
         findNonPrimes();
 
-        //then go through all the rules and stop if you find a qualifying number
+        //then go through all the rules and stop if you find the qualifying number
         while (currentNumber < 1000) {
             if (!sieve[currentNumber]) {
-                if (rules5to7()) {
-                    if (rules3and4()) {
+                if (rules3567()) {
+                    if (rule4()) {
                         foundNumber();
                         break;
                     }
@@ -66,11 +66,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //grouped solutions using Strings (Rules 5 - 7)
-    private boolean rules5to7() {
+    private boolean rules3567() {
         String workString = String.valueOf(currentNumber);
 
         //Rule 7
         if (currentNumber % 10 != workString.length()) return false;
+
+        //Rule 3 (Cole's solution, seems more elegant)
+        if (workString.contains("1")|| workString.contains("7")) return false;
 
         //Rule 6
         int rule6 = workString.charAt(workString.length() - 2) - '0';
@@ -80,16 +83,13 @@ public class MainActivity extends AppCompatActivity {
         return (workString.charAt(0) - '0' + workString.charAt(1) - '0') % 2 != 0;
     }
 
-    //grouped solutions using ints (Rules 3 & 4)
-    private boolean rules3and4() {
+    //Rule 4
+    private boolean rule4() {
         int sumDigits = 0;
         int workNumber = currentNumber;
 
         while (workNumber > 0) {
-            //Rule 3
-            if (workNumber % 10 == 1 || workNumber % 10 == 7) return false;
             sumDigits += workNumber % 10;
-            //Rule 4
             if (sumDigits > 10) return false;
             workNumber /= 10;
         }
@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    //display the number we've found
     public void foundNumber() {
         textView.setText(String.valueOf(currentNumber));
         textView.setTextColor(0xFF388E3C);
