@@ -48,3 +48,7 @@ I also took the time to eliminate some useless code. Perhaps tomorrow I'll think
 And voila! (I got spoiled when I saw the repo so I guess it's only fair I spoil it for you as well)
 
 ![](https://i.imgur.com/lrNgDbB.png)
+
+Ok, so it's morning and I just realised, this problem becomes very simple if you think about it enough beforehand. I guess it's lesson learned for me about rushing in to code something before properly figuring out what the rules mean. So, I was looking for a max number to limit my search for primes at, since rule 4 combined with rule 3 pretty much bring us below 900. But, as I mentioned in the new code, due to rules 2, 3, 4 and 7 we know that the last digit has to be 3, and the sum of the others has to be between 4 and 7; but due to rule 5, it literally has to be 5 or 7; applying rule 3 again, we actually figure out that the only possible numbers are 233, 323, 253, 343, 433 and 523; of course, now rule 6 comes in, and only leaves us with: 323, 343 and 523, at which point we could just test for prime and be done with it. And testing for primality for a small amount of numbers might just be as simple as testing divisibility with ints < sqrt of that number, instead of going to all the trouble of computing the sieve and keeping such a large array in memory. 
+
+I've decided to keep the solution only partially optimized, otherwise the entire app would just be testing 323, 343 and 523 for prime.
