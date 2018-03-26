@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * This program resolves the following quiz:
  * <p>
@@ -20,8 +22,8 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     TextView textView;
-    //init sieve to check it rapidly
-    boolean[] sieve = new boolean[1001];
+    //init sieve to hold only found primes
+    ArrayList<Integer> sieve = new ArrayList<>();
     //Rule 1
     //start at 243, due to rules 1, 3, 4, 5, 6, 7
     int currentNumber = 243;
@@ -37,31 +39,36 @@ public class MainActivity extends AppCompatActivity {
         findNonPrimes();
 
         //then go through all the rules and stop if you find the qualifying number
-        while (currentNumber < 1000) {
-            if (!sieve[currentNumber]) {
-                if (rules3567()) {
-                    if (rule4()) {
-                        foundNumber();
-                        break;
-                    }
+        for (int i : sieve) {
+            currentNumber = i;
+            if (rules3567()) {
+                if (rule4()) {
+                    foundNumber();
+                    break;
                 }
             }
-            currentNumber++;
         }
     }
 
     //find all non-primes using the Sieve of Eratosthenes (Rule 2)
     private void findNonPrimes() {
+        boolean[] workSieve = new boolean[1001];
+
         //init first two numbers as non-prime
-        sieve[0] = true;
-        sieve[1] = true;
+        workSieve[0] = true;
+        workSieve[1] = true;
 
         //build up the sieve, marking non-primes = true
         for (int i = 2; i <= (int) Math.sqrt(1000); i++) {
-            if (sieve[i]) continue;
+            if (workSieve[i]) continue;
             for (int j = (int) java.lang.Math.pow((double) i, 2); j <= 1000; j += i) {
-                sieve[j] = true;
+                workSieve[j] = true;
             }
+        }
+
+        //stop before 900 due to rules 3 and 4
+        for (int i = currentNumber; i <= 820; i++) {
+            if (!workSieve[i]) sieve.add(i);
         }
     }
 
@@ -73,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         if (currentNumber % 10 != workString.length()) return false;
 
         //Rule 3 (Cole's solution, seems more elegant)
-        if (workString.contains("1")|| workString.contains("7")) return false;
+        if (workString.contains("1") || workString.contains("7")) return false;
 
         //Rule 6
         int rule6 = workString.charAt(workString.length() - 2) - '0';
