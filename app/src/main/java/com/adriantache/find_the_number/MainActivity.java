@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 /**
  * This program resolves the following quiz:
  * <p>
@@ -21,91 +19,86 @@ import java.util.ArrayList;
  */
 
 public class MainActivity extends AppCompatActivity {
-    TextView textView;
-    //init sieve to hold only found primes
-    ArrayList<Integer> sieve = new ArrayList<>();
-    //Rule 1
-    //start at 243, due to rules 1, 3, 4, 5, 6, 7
-    int currentNumber = 243;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textView = findViewById(R.id.textView2);
-
         //start by finding primes (Rule 2)
         findNonPrimes();
-
-        //then go through all the rules and stop if you find the qualifying number
-        for (int i : sieve) {
-            currentNumber = i;
-            if (rules3567()) {
-                if (rule4()) {
-                    foundNumber();
-                    break;
-                }
-            }
-        }
     }
 
+    /**
+     * due to rules 2, 3, 4 and 7 we know that the last digit has to be 3, and the sum of the
+     * others has to be between 4 and 7; but due to rule 5, it literally has to be 5 or 7;
+     * applying rule 3 again, we actually figure out that the only possible numbers are
+     * 233, 323, 253, 343, 433 and 523; of course, now rule 6 comes in, and only leaves us with:
+     * 323, 343 and 523, at which point we could just test for prime and be done with it
+     */
     //find all non-primes using the Sieve of Eratosthenes (Rule 2)
     private void findNonPrimes() {
-        boolean[] workSieve = new boolean[1001];
+        boolean[] sieve = new boolean[1001];
 
         //init first two numbers as non-prime
-        workSieve[0] = true;
-        workSieve[1] = true;
+        sieve[0] = true;
+        sieve[1] = true;
 
         //build up the sieve, marking non-primes = true
         for (int i = 2; i <= (int) Math.sqrt(1000); i++) {
-            if (workSieve[i]) continue;
+            if (sieve[i]) continue;
             for (int j = (int) java.lang.Math.pow((double) i, 2); j <= 1000; j += i) {
-                workSieve[j] = true;
+                sieve[j] = true;
             }
         }
 
-        //stop before 900 due to rules 3 and 4
-        for (int i = currentNumber; i <= 820; i++) {
-            if (!workSieve[i]) sieve.add(i);
+
+        //Rule 1
+        //start at 243, due to rules 1, 3, 4, 5, 6, 7
+        int startingNumber = 243;
+
+        //was thinking of limiting this to some number, but it led to the comment I made above
+        //this method; it seems like thinking about the problem more just leaves a tiny amount
+        //of numbers to test for prime; as such, I'm just leaving this to 1000 so the program
+        //isn't just testing a few numbers and that's it
+        for (int i = startingNumber; i <= 1000; i++) {
+            if (sieve[i]) continue;
+
+            //Rule 7, part 1
+            if (i % 10 != 3) continue;
+
+            //then go through all the rules and stop if you find the qualifying number
+            if (rules(i)) {
+                foundNumber(i);
+                break;
+            }
         }
     }
 
     //grouped solutions using Strings (Rules 5 - 7)
-    private boolean rules3567() {
+    private boolean rules(int currentNumber) {
         String workString = String.valueOf(currentNumber);
 
-        //Rule 7
-        if (currentNumber % 10 != workString.length()) return false;
+        //Rule 7, part 2
+        if (workString.length() != 3) return false;
 
         //Rule 3 (Cole's solution, seems more elegant)
         if (workString.contains("1") || workString.contains("7")) return false;
 
         //Rule 6
         int rule6 = workString.charAt(workString.length() - 2) - '0';
-        if (rule6 % 2 != 0 || rule6 < 2) return false;
+        if (rule6 % 2 != 0 || rule6 == 0) return false;
+
+        //Rule 4 (since we know the last digit can only be 3, this becomes simple)
+        if ((workString.charAt(0) - '0' + workString.charAt(1) - '0') > 7) return false;
 
         //Rule 5
         return (workString.charAt(0) - '0' + workString.charAt(1) - '0') % 2 != 0;
     }
 
-    //Rule 4
-    private boolean rule4() {
-        int sumDigits = 0;
-        int workNumber = currentNumber;
-
-        while (workNumber > 0) {
-            sumDigits += workNumber % 10;
-            if (sumDigits > 10) return false;
-            workNumber /= 10;
-        }
-
-        return true;
-    }
-
     //display the number we've found
-    public void foundNumber() {
+    public void foundNumber(int currentNumber) {
+        TextView textView = findViewById(R.id.textView2);
         textView.setText(String.valueOf(currentNumber));
         textView.setTextColor(0xFF388E3C);
     }
